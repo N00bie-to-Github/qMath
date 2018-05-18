@@ -85,7 +85,7 @@ function nthroot(x, n) {
 function pow(x, n) {
     if(n > 0 && n < 1) {
         //convert to a quick fraction
-        var f = qfrac(n);
+        var f = fraction(n);
         return pow(nthroot(x, f[1]), f[0]);
     }
     if(n < 0) {
@@ -130,7 +130,6 @@ function gcd(a,b) {
     }
 }
 
-//convert number to rough fraction
 function qfrac(n) {
     var a, q;
     a = 1;
@@ -140,4 +139,30 @@ function qfrac(n) {
     }
     q = gcd(a, n);
     return [n/q, a/q];
+}
+
+function sign(x) {
+    return x/abs(x);
+}
+
+function fraction(x, e=0.0019){
+    var w, f, n, s, stack, dec, num;
+    s = sign(x);
+    stack = 0;
+    w = Math.floor(x);
+    n = x-w;
+    /*recursive function that transforms the fraction*/
+    function convert(x){
+        stack++;
+        var intgr = Math.floor(x); //get the integer part of the number
+        dec = (x - intgr); //get the decimal part of the number
+        if(dec < e || stack > 20) 
+            return [intgr,1]; //return the last integer you divided by
+        num = convert(1/dec); //call the function again with the inverted decimal part
+        return[intgr*num[0]+num[1],num[0]];
+    }
+    f = convert(n); 
+    f[0] += w*f[1];
+    f[0] *= s;
+    return f;
 }
